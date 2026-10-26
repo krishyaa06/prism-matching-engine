@@ -1,4 +1,4 @@
-<!-- Prism Systems 08/49 -->
+<!-- Prism Systems 08/12 -->
 <p align="center">
   <img src="https://capsule-render.vercel.app/api?type=waving&color=0:06070d,55:34F5C5,100:FF5C8A&height=210&section=header&text=Prism%20Matching%20Engine&fontSize=50&fontColor=ffffff&animation=fadeIn&fontAlignY=35&desc=Price-time%20CLOB%20with%20FIX%204.4%2C%20ledger%20and%20deterministic%20replay&descAlignY=57&descSize=17" width="100%" alt="Prism Matching Engine" />
 </p>
@@ -12,7 +12,7 @@
   <a href="https://krishyaa06.github.io/prism-matching-engine/"><img src="https://img.shields.io/badge/Live_Simulator-Open-34F5C5?style=for-the-badge&logo=githubpages&logoColor=black" alt="Live simulator" /></a>
   <img src="https://img.shields.io/badge/Node.js-%E2%89%A518.17-339933?style=for-the-badge&logo=nodedotjs&logoColor=white" alt="Node.js 18+" />
   <img src="https://img.shields.io/badge/dependencies-0-FF5C8A?style=for-the-badge" alt="Zero dependencies" />
-  <img src="https://img.shields.io/badge/Prism_Systems-08%2F49-111827?style=for-the-badge" alt="Prism Systems 08/49" />
+  <img src="https://img.shields.io/badge/Prism_Systems-08%2F12-111827?style=for-the-badge" alt="Prism Systems 08/12" />
   <a href="LICENSE"><img src="https://img.shields.io/github/license/krishyaa06/prism-matching-engine?style=for-the-badge&color=FF5C8A" alt="MIT License" /></a>
 </p>
 
@@ -252,7 +252,7 @@ The test suite uses the built-in `node:test` runner, so there is nothing to inst
 
 ## 🔷 Part of Prism Systems
 
-**Prism Matching Engine** is system **08 of 49** in **Prism Systems**, a series of open-source reference implementations of large-scale infrastructure by [Prism Protocol](https://dc.gg/prismprotocol). Each one ships a real engine, a CLI and a live simulator, all with zero dependencies.
+**Prism Matching Engine** is system **08 of 12** in **Prism Systems**, a series of open-source reference implementations of large-scale infrastructure by [Prism Protocol](https://dc.gg/prismprotocol). Each one ships a real engine, a CLI and a live simulator, all with zero dependencies.
 
 ## 👤 Author
 
