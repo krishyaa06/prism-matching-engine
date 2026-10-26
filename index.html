@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Prism Matching Engine · Price-time CLOB with FIX 4.4, ledger and deterministic replay · Prism Systems</title>
+  <meta name="description" content="Prism Matching Engine is the core of an exchange in plain JavaScript. Orders are validated against tick, lot, price band and available funds, then matched by price-time priority against sorted price levels with FIFO queues. Every fill settles immediately in a double-entry ledger (base, quote and fees, all integer 1e-8 units with BigInt notional), and resting orders hold exactly the funds they can still use. Stops trigger on the last trade and can cascade. A FIX 4.4 session layer handles Logon, sequence gaps, NewOrderSingle, Cancel and Replace with real BodyLength and CheckSum, and a TCP gateway exposes it. Every command is journaled, so replaying the journal on a fresh engine reproduces the same SHA-256 state hash." />
+  <meta name="theme-color" content="#06070d" />
+  <meta property="og:title" content="Prism Matching Engine · Prism Systems" />
+  <meta property="og:description" content="Prism Matching Engine is the core of an exchange in plain JavaScript. Orders are validated against tick, lot, price band and available funds, then matched by price-time priority against sorted price levels with FIFO queues. Every fill settles immediately in a double-entry ledger (base, quote and fees, all integer 1e-8 units with BigInt notional), and resting orders hold exactly the funds they can still use. Stops trigger on the last trade and can cascade. A FIX 4.4 session layer handles Logon, sequence gaps, NewOrderSingle, Cancel and Replace with real BodyLength and CheckSum, and a TCP gateway exposes it. Every command is journaled, so replaying the journal on a fresh engine reproduces the same SHA-256 state hash." />
+  <meta property="og:image" content="https://krishyaa06.github.io/prism-matching-engine/assets/screenshots/desktop.png" />
+  <link rel="icon" href="assets/logo.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/pro.css" />
+  <link rel="stylesheet" href="css/app.css" />
+  <style>:root{--accent:#34F5C5;--accent-2:#FF5C8A}</style>
+</head>
+<body>
+  <canvas id="bg" aria-hidden="true"></canvas>
+  <header class="topbar"><div class="wrap">
+    <a class="brand" href="./"><span class="mark">◆</span><b>PRISM</b><span>Match</span></a>
+    <nav>
+      <a class="nl" href="#sim">Simulator</a><a class="nl" href="#features">Features</a><a class="nl" href="#how">How it works</a><a class="nl" href="#arch">Architecture</a><a class="nl" href="#use">Use it</a>
+      <a class="btn sm" href="https://github.com/krishyaa06/prism-matching-engine" target="_blank" rel="noreferrer">★ GitHub</a>
+    </nav>
+  </div></header>
+  <main>
+    <section class="hero wrap">
+      <p class="eyebrow"><span class="n">08 / 49</span>Prism Systems · FinTech &amp; Banking</p>
+      <h1>An exchange core that <em>matches, settles and replays</em> to the exact same state</h1>
+      <p class="lead">A price-time priority central limit order book with limit, market, stop, stop-limit, IOC, FOK, DAY and post-only orders, self-trade prevention, price bands and market collars, a double-entry multi-currency ledger with funds holds and maker/taker fees, a FIX 4.4 session layer and TCP gateway, and a deterministic input journal that replays to an identical state hash.</p>
+      <div class="cta"><a class="btn primary" href="#sim">▶ Launch the simulator</a><a class="btn" href="#use">Use the engine</a><a class="btn ghost" href="https://github.com/krishyaa06/prism-matching-engine" target="_blank" rel="noreferrer">View source →</a></div>
+      <div class="chips"><span class="chip"><i></i>Zero dependencies</span><span class="chip"><i></i>Integer fixed-point</span><span class="chip"><i></i>FIX 4.4 + TCP gateway</span><span class="chip"><i></i>Double-entry ledger</span><span class="chip"><i></i>Deterministic replay</span></div>
+    </section>
+    <section class="section wrap" id="sim">
+      <div class="sec-head"><span class="kicker">Live simulator</span><h2>A live BTC-USD order book with market makers, takers and stops</h2><p>Three market makers quote post-only ladders and six takers trade against them. Send your own orders through a real FIX session, plant a stop cluster and let a whale sell through it, or pull the makers and watch the spread blow out.</p></div>
+<div class="sim">
+  <div class="main">
+    <div class="panel glow">
+      <div class="toolbar">
+        <button class="btn primary sm" data-play>▶ Run</button>
+        <select data-speed aria-label="Speed"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="3">3×</option></select>
+        <span class="sep"></span>
+        <button class="btn sm bad" id="wsell">Whale sells 40 BTC</button>
+        <button class="btn sm" id="wbuy">Whale buys 40 BTC</button>
+        <button class="btn sm" id="pull">Pull makers</button>
+        <button class="btn sm" id="stops">Plant stop cluster</button>
+        <span class="sp"></span>
+        <span class="live"><i></i> paused</span>
+      </div>
+      <div id="kpis" style="margin-top:12px"></div>
+    </div>
+    <div class="viz" id="bookw" style="height:460px"><span class="tag" id="clock">BTC-USD · central limit order book</span><canvas id="book"></canvas></div>
+    <div class="g2 grid">
+      <div class="panel"><div class="ph">Price · mid vs last</div><canvas class="chart" id="ch1" style="height:150px"></canvas></div>
+      <div class="panel"><div class="ph">Trades / s by aggressor</div><canvas class="chart" id="ch2" style="height:150px"></canvas></div>
+    </div>
+  </div>
+  <div class="side">
+    <div class="panel"><div class="ph">Order ticket <span class="sp"></span><span class="pill dim">via FIX 4.4</span></div>
+      <div class="tk">
+        <div class="seg" id="side"><button class="btn sm on buy" data-v="buy">Buy</button><button class="btn sm sell" data-v="sell">Sell</button></div>
+        <label class="f">Type<select id="otype"><option value="limit">Limit</option><option value="market">Market</option><option value="stop">Stop</option><option value="stop-limit">Stop-limit</option></select></label>
+        <label class="f">TIF<select id="tif"><option>GTC</option><option>IOC</option><option>FOK</option><option>DAY</option></select></label>
+        <label class="f" id="pxf">Price<input id="px" inputmode="decimal"></label>
+        <label class="f" id="spf" hidden>Stop<input id="spx" inputmode="decimal"></label>
+        <label class="f">Qty BTC<input id="qty" value="0.5" inputmode="decimal"></label>
+        <div class="po"><input type="checkbox" id="post"><label for="post">post-only (maker or reject)</label></div>
+      </div>
+      <div class="toolbar" style="margin-top:8px"><button class="btn primary sm" id="send">Send order</button><button class="btn sm" id="join">Join bid</button><button class="btn sm" id="lift">Lift ask</button><span class="sp"></span><span id="tstat" class="tstat"></span></div>
+      <div class="bal" id="bal"></div>
+      <div class="ph" style="margin-top:10px">My open orders</div>
+      <div id="mine" class="mine"></div>
+    </div>
+    <div class="panel"><div class="ph">FIX wire <span class="sp"></span><span class="pill dim" id="seq">seq —</span></div><div id="wire" class="log" style="height:190px;font-size:10.5px"></div></div>
+    <div class="panel"><div class="ph">Tape &amp; events</div><div id="log" class="log" style="height:200px;font-size:11px"></div></div>
+  </div>
+</div>
+
+    </section>
+    <section class="section wrap" id="features">
+      <div class="sec-head reveal"><span class="kicker">Features</span><h2>What's inside the engine</h2><p>Real algorithms, not mock-ups. The simulator above runs the exact same code you import.</p></div>
+      <div class="feat"><div class="card reveal"><div class="ic">⇅</div><h3>Price-time priority</h3><p>Price levels are kept sorted best-first with binary search, each level is a FIFO queue, and cancels are O(1) through lazy deletion with periodic compaction.</p></div><div class="card reveal"><div class="ic">◧</div><h3>Every order type</h3><p>Limit, market (converted to IOC with a 2% collar), stop and stop-limit, with GTC, IOC, FOK (pre-checked for full liquidity) and DAY, plus post-only that rejects instead of taking.</p></div><div class="card reveal"><div class="ic">⛨</div><h3>Pre-trade risk</h3><p>Tick and lot checks, a fat-finger price band around the last price, max order size, funds holds at the worst possible price, and self-trade prevention (cancel-resting or cancel-taker).</p></div><div class="card reveal"><div class="ic">⚖</div><h3>Double-entry ledger</h3><p>Each fill posts balanced legs for base, quote and maker/taker fees. Balances split into available and held, and <code class="mono">verify()</code> proves every currency sums to zero.</p></div><div class="card reveal"><div class="ic">⌁</div><h3>FIX 4.4</h3><p>Encoder and parser with BodyLength and CheckSum, a session with Logon, sequence-gap ResendRequest, session Reject, and D/F/G mapped to ExecutionReport and OrderCancelReject.</p></div><div class="card reveal"><div class="ic">↺</div><h3>Cancel / replace</h3><p>Reducing quantity keeps queue priority, changing price or increasing size re-queues at the back, and a replace that crosses matches immediately.</p></div><div class="card reveal"><div class="ic">⚡</div><h3>Stops that cascade</h3><p>Stops trigger on the last trade price and fire as market or limit orders, which can move the price and trigger the next stop in the same command.</p></div><div class="card reveal"><div class="ic">#</div><h3>Deterministic replay</h3><p>Commands are journaled before execution. Replaying the journal into a fresh engine reproduces the same SHA-256 hash over books, stops, balances and sequence numbers.</p></div></div>
+    </section>
+    <section class="section wrap" id="how">
+      <div class="sec-head reveal"><span class="kicker">How it works</span><h2>From request to result</h2></div>
+      <div class="steps"><div class="step reveal"><h3>Validate</h3><p>Symbol, side, type and TIF are checked, then tick, lot, price band and max size. A market order gets a collar price so it can never sweep the whole book.</p></div><div class="step reveal"><h3>Hold funds</h3><p>Buyers hold quote at the worst price plus the max fee, sellers hold base. Orders without funds are rejected before touching the book.</p></div><div class="step reveal"><h3>Match</h3><p>The order walks the opposite side best price first and FIFO within a level, applying self-trade prevention. FOK checks available quantity first.</p></div><div class="step reveal"><h3>Settle</h3><p>Each fill posts a balanced journal entry: base and quote move between accounts, fees go to the fee account, unused holds are released.</p></div><div class="step reveal"><h3>Rest or finish</h3><p>Leftover GTC/DAY quantity rests in the book, IOC remainders cancel, then stops are checked against the new last price.</p></div></div>
+    </section>
+    <section class="section wrap" id="arch">
+      <div class="sec-head reveal"><span class="kicker">Architecture</span><h2>System design</h2><p>Every box is a module in src/. Data flows left to right.</p></div>
+      <div class="card arch reveal"><svg viewBox="0 0 1160 230" role="img" aria-label="Architecture diagram"><path class="e" d="M272,73 C290,73 290,73 308,73"/><path class="f" d="M272,73 C290,73 290,73 308,73"/><path class="e" d="M272,153 C290,153 290,73 308,73"/><path class="f" d="M272,153 C290,153 290,73 308,73"/><path class="e" d="M548,102 C578,102 578,124 548,124"/><path class="f" d="M548,102 C578,102 578,124 548,124"/><path class="e" d="M562,153 C580,153 580,73 598,73"/><path class="f" d="M562,153 C580,153 580,73 598,73"/><path class="e" d="M838,102 C868,102 868,124 838,124"/><path class="f" d="M838,102 C868,102 868,124 838,124"/><text class="el" x="868" y="113" text-anchor="middle">last px</text><path class="e" d="M852,73 C870,73 870,73 888,73"/><path class="f" d="M852,73 C870,73 870,73 888,73"/><text class="el" x="870" y="67" text-anchor="middle">fills</text><path class="e" d="M852,73 C870,73 870,153 888,153"/><path class="f" d="M852,73 C870,73 870,153 888,153"/><text class="lane" x="145" y="24" text-anchor="middle">GATEWAYS</text><g class="node k0"><rect x="18" y="44" width="254" height="58" rx="12"/><text x="145" y="69" text-anchor="middle">FIX 4.4 session</text><text class="s" x="145" y="83" text-anchor="middle">seq · checksum</text></g><g class="node k0"><rect x="18" y="124" width="254" height="58" rx="12"/><text x="145" y="149" text-anchor="middle">JS API</text><text class="s" x="145" y="163" text-anchor="middle">submit · cancel · replace</text></g><text class="lane" x="435" y="24" text-anchor="middle">SEQUENCER</text><g class="node kk2"><rect x="308" y="44" width="254" height="58" rx="12"/><text x="435" y="69" text-anchor="middle">Input journal</text><text class="s" x="435" y="83" text-anchor="middle">replayable</text></g><g class="node kk2"><rect x="308" y="124" width="254" height="58" rx="12"/><text x="435" y="149" text-anchor="middle">Pre-trade risk</text><text class="s" x="435" y="163" text-anchor="middle">band · funds · STP</text></g><text class="lane" x="725" y="24" text-anchor="middle">MATCHING</text><g class="node kk3"><rect x="598" y="44" width="254" height="58" rx="12"/><text x="725" y="69" text-anchor="middle">Order books</text><text class="s" x="725" y="83" text-anchor="middle">price-time FIFO</text></g><g class="node kk3"><rect x="598" y="124" width="254" height="58" rx="12"/><text x="725" y="149" text-anchor="middle">Stop book</text><text class="s" x="725" y="163" text-anchor="middle">trigger on last</text></g><text class="lane" x="1015" y="24" text-anchor="middle">POST-TRADE</text><g class="node k0"><rect x="888" y="44" width="254" height="58" rx="12"/><text x="1015" y="69" text-anchor="middle">Ledger</text><text class="s" x="1015" y="83" text-anchor="middle">double-entry</text></g><g class="node k0"><rect x="888" y="124" width="254" height="58" rx="12"/><text x="1015" y="149" text-anchor="middle">Exec reports</text><text class="s" x="1015" y="163" text-anchor="middle">tape · settlement</text></g></svg></div>
+    </section>
+    <section class="section wrap" id="use">
+      <div class="sec-head reveal"><span class="kicker">Use it</span><h2>Ship it in your own stack</h2><p>Zero dependencies. Works in Node.js 18+ and modern browsers.</p></div>
+      <div class="tabs" data-tabs="use"><button class="on">JavaScript API</button><button>CLI</button><button>Install</button></div>
+      <div class="tabp on" data-tabp="use"><div class="codebox"><div class="bar2"><i></i><i></i><i></i><span>example.js</span><button class="btn sm ghost copy" data-copy>Copy</button></div><pre><code><span class="tk-k">import</span> { Engine, FixSession, FixClient, toUnits } <span class="tk-k">from</span> <span class="tk-s">&quot;prism-matching-engine&quot;</span>;
+
+<span class="tk-k">const</span> ex = <span class="tk-k">new</span> <span class="tk-f">Engine</span>({ fees: { maker: <span class="tk-n">2</span>, taker: <span class="tk-n">10</span> }, stp: <span class="tk-s">&quot;cancel-resting&quot;</span> });   <span class="tk-c">// bps</span>
+ex.ledger.<span class="tk-f">deposit</span>(<span class="tk-s">&quot;alice&quot;</span>, <span class="tk-s">&quot;BTC&quot;</span>, <span class="tk-f">BigInt</span>(<span class="tk-f">toUnits</span>(<span class="tk-s">&quot;2&quot;</span>)));
+ex.ledger.<span class="tk-f">deposit</span>(<span class="tk-s">&quot;bob&quot;</span>, <span class="tk-s">&quot;USD&quot;</span>, <span class="tk-f">BigInt</span>(<span class="tk-f">toUnits</span>(<span class="tk-s">&quot;200000&quot;</span>)));
+
+ex.<span class="tk-f">submit</span>({ account: <span class="tk-s">&quot;alice&quot;</span>, symbol: <span class="tk-s">&quot;BTC-USD&quot;</span>, side: <span class="tk-s">&quot;sell&quot;</span>, px: <span class="tk-s">&quot;65000.50&quot;</span>, qty: <span class="tk-s">&quot;1.2&quot;</span> });
+<span class="tk-k">const</span> r = ex.<span class="tk-f">submit</span>({ account: <span class="tk-s">&quot;bob&quot;</span>, symbol: <span class="tk-s">&quot;BTC-USD&quot;</span>, side: <span class="tk-s">&quot;buy&quot;</span>, type: <span class="tk-s">&quot;market&quot;</span>, qty: <span class="tk-s">&quot;0.5&quot;</span> });
+r.trades;    <span class="tk-c">// [{ id: &quot;T1&quot;, px: 6500050000000, qty: 50000000, buyer: &quot;bob&quot;, seller: &quot;alice&quot;, ... }]</span>
+r.reports;   <span class="tk-c">// execution reports: new / trade / canceled / rejected / replaced / triggered</span>
+
+ex.<span class="tk-f">submit</span>({ account: <span class="tk-s">&quot;alice&quot;</span>, symbol: <span class="tk-s">&quot;BTC-USD&quot;</span>, side: <span class="tk-s">&quot;sell&quot;</span>, type: <span class="tk-s">&quot;stop&quot;</span>, stopPx: <span class="tk-s">&quot;64980&quot;</span>, qty: <span class="tk-s">&quot;0.3&quot;</span> });
+ex.<span class="tk-f">replace</span>(<span class="tk-s">&quot;O1&quot;</span>, { qty: <span class="tk-s">&quot;1.0&quot;</span> });          <span class="tk-c">// smaller qty keeps queue priority</span>
+ex.<span class="tk-f">book</span>(<span class="tk-s">&quot;BTC-USD&quot;</span>).<span class="tk-f">depth</span>(<span class="tk-n">5</span>);               <span class="tk-c">// { bids: [{ px, qty, orders }], asks: [...] }</span>
+ex.ledger.<span class="tk-f">verify</span>();                        <span class="tk-c">// { ok: true } — every currency sums to zero</span>
+
+<span class="tk-k">const</span> again = Engine.<span class="tk-f">replay</span>(ex.input, {}, seedDeposits);
+again.<span class="tk-f">stateHash</span>() === ex.<span class="tk-f">stateHash</span>();      <span class="tk-c">// true</span>
+
+<span class="tk-k">const</span> fix = <span class="tk-k">new</span> <span class="tk-f">FixSession</span>(ex), cl = <span class="tk-k">new</span> <span class="tk-f">FixClient</span>();
+fix.<span class="tk-f">handle</span>(cl.<span class="tk-f">logon</span>());
+fix.<span class="tk-f">handle</span>(cl.<span class="tk-f">order</span>({ clOrdId: <span class="tk-s">&quot;a1&quot;</span>, account: <span class="tk-s">&quot;bob&quot;</span>, symbol: <span class="tk-s">&quot;BTC-USD&quot;</span>, side: <span class="tk-s">&quot;buy&quot;</span>, px: <span class="tk-s">&quot;65000.50&quot;</span>, qty: <span class="tk-s">&quot;0.1&quot;</span>, tif: <span class="tk-s">&quot;IOC&quot;</span> }));</code></pre></div></div>
+      <div class="tabp" data-tabp="use"><div class="codebox"><div class="bar2"><i></i><i></i><i></i><span>terminal</span><button class="btn sm ghost copy" data-copy>Copy</button></div><pre><code><span class="tk-pr">$ </span>npx github:krishyaa06/prism-matching-engine demo
+<span class="tk-pr">$ </span>npx github:krishyaa06/prism-matching-engine book <span class="tk-p">--secs</span> 30
+<span class="tk-pr">$ </span>npx github:krishyaa06/prism-matching-engine fix examples/orders.fix
+<span class="tk-pr">$ </span>npx github:krishyaa06/prism-matching-engine bench <span class="tk-p">--orders</span> 300000
+<span class="tk-pr">$ </span>npx github:krishyaa06/prism-matching-engine replay
+<span class="tk-pr">$ </span>npx github:krishyaa06/prism-matching-engine serve <span class="tk-p">--port</span> 9878</code></pre></div></div>
+      <div class="tabp" data-tabp="use"><div class="codebox"><div class="bar2"><i></i><i></i><i></i><span>terminal</span><button class="btn sm ghost copy" data-copy>Copy</button></div><pre><code><span class="tk-c"># use the CLI without installing</span>
+<span class="tk-pr">$ </span>npx github:krishyaa06/prism-matching-engine <span class="tk-p">--help</span>
+
+<span class="tk-c"># or add the engine to your project</span>
+<span class="tk-pr">$ </span>npm install github:krishyaa06/prism-matching-engine
+
+<span class="tk-c"># run the simulator locally</span>
+<span class="tk-pr">$ </span>git clone https://github.com/krishyaa06/prism-matching-engine.git &amp;&amp; cd prism-matching-engine
+<span class="tk-pr">$ </span>npx serve .   # then open http://localhost:3000</code></pre></div></div>
+    </section>
+  </main>
+  <footer class="foot"><div class="wrap">
+    <span>◆ Prism Matching Engine · Prism Systems 08/49 · Built by <a href="https://github.com/krishyaa06">Soumya Bhandare</a> &amp; <a href="https://dc.gg/prismprotocol" target="_blank" rel="noreferrer">Prism Protocol</a></span>
+    <span><a href="https://github.com/krishyaa06/prism-matching-engine" target="_blank" rel="noreferrer">Source</a> · <a href="https://github.com/krishyaa06/prism-matching-engine/blob/main/docs/ARCHITECTURE.md">Architecture</a> · <a href="https://github.com/krishyaa06/prism-matching-engine/blob/main/docs/USAGE.md">Docs</a> · MIT License</span>
+  </div></footer>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

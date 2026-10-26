@@ -1,0 +1,42 @@
+<div class="sim">
+  <div class="main">
+    <div class="panel glow">
+      <div class="toolbar">
+        <button class="btn primary sm" data-play>▶ Run</button>
+        <select data-speed aria-label="Speed"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="3">3×</option></select>
+        <span class="sep"></span>
+        <button class="btn sm bad" id="wsell">Whale sells 40 BTC</button>
+        <button class="btn sm" id="wbuy">Whale buys 40 BTC</button>
+        <button class="btn sm" id="pull">Pull makers</button>
+        <button class="btn sm" id="stops">Plant stop cluster</button>
+        <span class="sp"></span>
+        <span class="live"><i></i> paused</span>
+      </div>
+      <div id="kpis" style="margin-top:12px"></div>
+    </div>
+    <div class="viz" id="bookw" style="height:460px"><span class="tag" id="clock">BTC-USD · central limit order book</span><canvas id="book"></canvas></div>
+    <div class="g2 grid">
+      <div class="panel"><div class="ph">Price · mid vs last</div><canvas class="chart" id="ch1" style="height:150px"></canvas></div>
+      <div class="panel"><div class="ph">Trades / s by aggressor</div><canvas class="chart" id="ch2" style="height:150px"></canvas></div>
+    </div>
+  </div>
+  <div class="side">
+    <div class="panel"><div class="ph">Order ticket <span class="sp"></span><span class="pill dim">via FIX 4.4</span></div>
+      <div class="tk">
+        <div class="seg" id="side"><button class="btn sm on buy" data-v="buy">Buy</button><button class="btn sm sell" data-v="sell">Sell</button></div>
+        <label class="f">Type<select id="otype"><option value="limit">Limit</option><option value="market">Market</option><option value="stop">Stop</option><option value="stop-limit">Stop-limit</option></select></label>
+        <label class="f">TIF<select id="tif"><option>GTC</option><option>IOC</option><option>FOK</option><option>DAY</option></select></label>
+        <label class="f" id="pxf">Price<input id="px" inputmode="decimal"></label>
+        <label class="f" id="spf" hidden>Stop<input id="spx" inputmode="decimal"></label>
+        <label class="f">Qty BTC<input id="qty" value="0.5" inputmode="decimal"></label>
+        <div class="po"><input type="checkbox" id="post"><label for="post">post-only (maker or reject)</label></div>
+      </div>
+      <div class="toolbar" style="margin-top:8px"><button class="btn primary sm" id="send">Send order</button><button class="btn sm" id="join">Join bid</button><button class="btn sm" id="lift">Lift ask</button><span class="sp"></span><span id="tstat" class="tstat"></span></div>
+      <div class="bal" id="bal"></div>
+      <div class="ph" style="margin-top:10px">My open orders</div>
+      <div id="mine" class="mine"></div>
+    </div>
+    <div class="panel"><div class="ph">FIX wire <span class="sp"></span><span class="pill dim" id="seq">seq —</span></div><div id="wire" class="log" style="height:190px;font-size:10.5px"></div></div>
+    <div class="panel"><div class="ph">Tape &amp; events</div><div id="log" class="log" style="height:200px;font-size:11px"></div></div>
+  </div>
+</div>

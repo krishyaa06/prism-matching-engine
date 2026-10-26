@@ -1,0 +1,43 @@
+{
+  "name": "prism-matching-engine",
+  "version": "1.0.0",
+  "description": "Prism Matching Engine is the core of an exchange in plain JavaScript. Orders are validated against tick, lot, price band and available funds, then matched by price-time priority against sorted price levels with FIFO queues. Every fill settles immediately in a double-entry ledger (base, quote and fees, all integer 1e-8 units with BigInt notional), and resting orders hold exactly the funds they can still use. Stops trigger on the last trade and can cascade. A FIX 4.4 session layer handles Logon, sequence gaps, NewOrderSingle, Cancel and Replace with real BodyLength and CheckSum, and a TCP gateway exposes it. Every command is journaled, so replaying the journal on a fresh engine reproduces the same SHA-256 state hash.",
+  "type": "module",
+  "bin": {
+    "match": "bin/match.js"
+  },
+  "main": "src/index.js",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "files": [
+    "bin",
+    "src"
+  ],
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "start": "npx --yes serve ."
+  },
+  "keywords": [
+    "matching-engine",
+    "order-book",
+    "exchange",
+    "trading",
+    "fix-protocol",
+    "fintech",
+    "limit-order-book",
+    "ledger",
+    "market-microstructure",
+    "javascript"
+  ],
+  "author": "Soumya Bhandare (krishyaa06)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/krishyaa06/prism-matching-engine.git"
+  },
+  "homepage": "https://krishyaa06.github.io/prism-matching-engine/",
+  "engines": {
+    "node": ">=18.17"
+  }
+}

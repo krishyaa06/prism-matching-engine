@@ -1,0 +1,26 @@
+#kpis{grid-template-columns:repeat(6,minmax(0,1fr))}
+@media(max-width:1200px){#kpis{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:480px){#kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){#bookw{height:620px!important}}
+.tk{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.tk .seg{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.tk .seg .btn{justify-content:center}
+.tk .seg .btn.on.buy{background:rgba(52,245,197,.16);border-color:var(--ok);color:var(--ok)}
+.tk .seg .btn.on.sell{background:rgba(255,92,138,.16);border-color:var(--bad);color:var(--bad)}
+.tk label.f{display:flex;flex-direction:column;gap:4px;font-size:11px;color:var(--muted);min-width:0}
+.tk input,.tk select{width:100%;min-width:0;font:12px var(--mono)}
+.tk .po input{width:auto;margin:0;flex:none}.tk .po label{display:inline;color:var(--muted)}
+.tk .po{grid-column:1/-1;font-size:11px;color:var(--muted);display:flex;align-items:center;gap:6px}
+.tstat{font:11px var(--mono);color:var(--muted);text-align:right;max-width:46%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tstat.bad{color:var(--bad)}.tstat.ok{color:var(--ok)}
+.bal{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin-top:10px;font:11px var(--mono)}
+.bal div{background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:8px;padding:6px 8px}
+.bal b{display:block;font-size:12.5px;color:var(--text);font-weight:600}
+.bal span{color:var(--muted)}
+.mine{font:11px var(--mono);max-height:140px;overflow:auto}
+.mine .row{display:flex;gap:8px;align-items:center;padding:4px 0;border-bottom:1px solid var(--line)}
+.mine .row .sp{flex:1}
+.mine .x{padding:2px 8px;font-size:10px}
+.mine .empty{color:var(--faint);padding:6px 0}
+.buyc{color:var(--ok)}.sellc{color:var(--bad)}
+#wire .m{white-space:pre-wrap;word-break:break-all}
